@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments Info</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-btn {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comments Information</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="comments-table-body">
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const commentsTableBody = document.getElementById('comments-table-body');
+            const savedComments = JSON.parse(localStorage.getItem('comments')) || [];
+
+            // Define your admin email here
+            const adminEmail = "admin@example.com";
+
+            function loadComments() {
+                commentsTableBody.innerHTML = '';
+                savedComments.forEach(comment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${comment.name}</td>
+                        <td>${comment.email}</td>
+                        <td>${comment.message}</td>
+                        <td><span class="delete-btn" data-id="${comment.id}">Delete</span></td>
+                    `;
+                    commentsTableBody.appendChild(row);
+                });
+            }
+
+            loadComments();
+
+            commentsTableBody.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-btn')) {
+                    const commentId = event.target.getAttribute('data-id');
+                    const email = prompt('Please enter your email to confirm deletion:');
+                    if (email === adminEmail) {
+                        deleteComment(commentId);
+                    } else {
+                        alert('Only the admin can delete comments.');
+                    }
+                }
+            });
+
+            function deleteComment(id) {
+                const commentIndex = savedComments.findIndex(comment => comment.id === id);
+                if (commentIndex > -1) {
+                    savedComments.splice(commentIndex, 1);
+                    localStorage.setItem('comments', JSON.stringify(savedComments));
+                    loadComments();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
